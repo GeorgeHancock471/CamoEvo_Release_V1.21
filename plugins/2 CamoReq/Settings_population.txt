@@ -1,0 +1,7 @@
+Target=	Default_Moth
+blank
+blank
+blank
+blank
+blank
+ColourSpace =		0	100	-40	40	-5	60

@@ -1,0 +1,296 @@
+/*____________________________________________________________________
+
+	Title: Measure LAB Values
+	Authors:  George Hancock and Jolyon Troscianko
+	Date: 19/04/22
+	
+.................................................................................................................
+
+Description:
+''''''''''''''''''''''''''''''''
+Measures the LAB Mean, Dev and GabRat
+
+*/
+
+
+popDIR = getDirectory("population");
+FolderName=File.getName(popDIR);
+saveDIR = popDIR + "Data_Measures_" + FolderName +".txt";
+
+while(roiManager("count")>0){
+roiManager("select", 0);
+roiManager("delete");
+}
+
+
+setBatchMode(true);
+
+selectImage("Background");
+run("Lab Stack");
+
+//MeasureTitles
+//========================================
+
+//Make Sure to add all the titles and in the same order as the measurements.
+
+TiArray=newArray();
+
+TiArray=Array.concat(TiArray,"Target_L_Positive","Global_L_Positive","Local_L_Positive");
+TiArray=Array.concat(TiArray,"Target_L_Negative","Global_L_Negative","Local_L_Negative");
+
+TiArray=Array.concat(TiArray,"Target_A_Positive","Global_A_Positive","Local_A_Positive");
+TiArray=Array.concat(TiArray,"Target_A_Negative","Global_A_Negative","Local_A_Negative");
+
+TiArray=Array.concat(TiArray,"Target_B_Positive","Global_B_Positive","Local_B_Positive");
+TiArray=Array.concat(TiArray,"Target_B_Negative","Global_B_Negative","Local_B_Negative");
+
+TiArray=Array.concat(TiArray,"Target_L_GabRat","Target_A_GabRat","Target_B_GabRat");
+
+
+
+if(!File.exists(saveDIR)){
+File.append(String.join(TiArray,"\t"),saveDIR);
+}
+
+
+
+//Measures Array
+//========================================
+
+MsArray=newArray(); // Blank Measure Array
+
+selectImage("TargetMask");
+run("Create Selection");
+roiManager("Add");
+	roiManager("select",0);
+	run("Interpolate", "interval=1");
+	roiManager("update");
+	roiManager("select",0);
+close();
+
+selectImage("LocalMask");
+run("Create Selection");
+roiManager("Add");
+close();
+
+
+selectImage("Background");
+setSlice(1);
+run("Duplicate...", "title=[Lpositive]");
+run("Enhance Contrast...", "saturated=0 normalize");
+run("Duplicate...", "title=[Lnegative]");
+run("Duplicate...", "title=[Lblur]");
+run("Gaussian Blur...","sigma=50");
+run("Copy");
+close();
+setPasteMode("Subtract");
+selectImage("Lnegative");
+run("Paste");
+run("Max...","value=0");
+run("Square");
+run("Square Root");
+
+selectImage("Lpositive");
+run("Paste");
+run("Min...","value=0");
+
+
+
+selectImage("Background");
+setSlice(2);
+run("Duplicate...", "title=[Apositive]");
+run("Enhance Contrast...", "saturated=0 normalize");
+run("Duplicate...", "title=[Anegative]");
+run("Duplicate...", "title=[Ablur]");
+run("Gaussian Blur...","sigma=50");
+run("Copy");
+close();
+setPasteMode("Subtract");
+selectImage("Anegative");
+run("Paste");
+run("Max...","value=0");
+run("Square");
+run("Square Root");
+
+
+selectImage("Apositive");
+run("Paste");
+run("Min...","value=0");
+
+
+selectImage("Background");
+setSlice(3);
+run("Duplicate...", "title=[Bpositive]");
+run("Enhance Contrast...", "saturated=0 normalize");
+run("Duplicate...", "title=[Bnegative]");
+run("Duplicate...", "title=[Bblur]");
+run("Gaussian Blur...","sigma=50");
+run("Copy");
+close();
+setPasteMode("Subtract");
+selectImage("Bnegative");
+run("Paste");
+run("Max...","value=0");
+run("Square");
+run("Square Root");
+
+selectImage("Bpositive");
+run("Paste");
+run("Min...","value=0");
+
+//L positive
+//========================================
+
+selectImage("Lpositive");
+
+roiManager("select",0);
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+run("Make Inverse");
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+roiManager("select",1);
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+close();
+
+//L negative
+//========================================
+
+selectImage("Lnegative");
+
+roiManager("select",0);
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+run("Make Inverse");
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+roiManager("select",1);
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+close();
+
+
+
+//A positive
+//========================================
+
+selectImage("Apositive");
+
+roiManager("select",0);
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+run("Make Inverse");
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+roiManager("select",1);
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+close();
+
+//A negative
+//========================================
+
+selectImage("Anegative");
+
+roiManager("select",0);
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+run("Make Inverse");
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+roiManager("select",1);
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+close();
+
+
+
+//B positive
+//========================================
+
+selectImage("Bpositive");
+
+roiManager("select",0);
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+run("Make Inverse");
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+roiManager("select",1);
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+close();
+
+//B negative
+//========================================
+
+selectImage("Bnegative");
+
+roiManager("select",0);
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+run("Make Inverse");
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+roiManager("select",1);
+getStatistics(area,mean,min,max,sd);
+MsArray=Array.concat(MsArray,mean); // Adds the measure to the measure array.
+
+close();
+
+
+
+
+
+//GabRat
+//========================================
+roiManager("Select", 0);
+
+
+	angles = 6;
+	sigma = 3.0;
+	gamma = 1.0;
+	freq = 2.0;
+
+
+tStr = getTitle + "_" + tStr;
+
+for(z=0;z<3;z++){
+		setSlice(z+1);
+		tStr2 = tStr + "_" + getMetadata("Label");
+		run("GabRat Disruption", "number_of_angles=&angles sigma=&sigma gamma=&gamma frequency=&freq label=&tStr2");
+}
+
+
+
+
+MsArray=Array.concat(MsArray,getResult("GabRat",0),getResult("GabRat",1),getResult("GabRat",2)); // Adds the measure to the measure array.
+
+
+close("Background");
+
+
+//------------------------------------------------------------------------------------------------------------------
+
+//Save Measurements
+//========================================
+
+File.append(String.join(MsArray,"\t"),saveDIR);

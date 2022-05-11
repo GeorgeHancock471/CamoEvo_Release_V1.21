@@ -1,0 +1,5 @@
+Cycles per degree
+8
+Angular width of image
+20
+5

@@ -1,0 +1,16 @@
+Visible
+Same photo
+0
+7
+0
+0
+0
+None
+16
+1
+0.005
+1
+1
+Linear Normalised Reflectance Stack
+Test
+1
